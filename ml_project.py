@@ -1,5 +1,6 @@
 import numpy as np
 import csv
+import matplotlib.pyplot as plt
 
 def load_data(filename):
     with open(filename,'r') as f:
@@ -22,12 +23,13 @@ class LogisticRegression():
 
     def predict(self,x):
         pred = self.sigmoid(self.g_x(x))
+        score = pred
         for i in range(len(x)):
             if pred[i] <= 0.5:
                 pred[i] = 0
             else:
                 pred[i] = 1
-        return pred
+        return score
 
     def cost_function(self,x,y):
         cost,pred = np.zeros((len(y),1)),self.predict(x)
@@ -64,6 +66,14 @@ class LogisticRegression():
                 err_count += 1
         return 1 - err_count/len(y)
 
+def plot(y):
+    x = np.zeros(y.shape)
+    for i in range(1,len(y)+1):
+        x[i-1] = i
+    plt.scatter(x[:100],y[:100],c='r')
+    plt.scatter(x[100:],y[100:],c='b')
+    plt.show()
+
 data = load_data("data_banknote_authentication.txt")
 train_0,test_0 = data[:661,:],data[662:762,:]
 train_1,test_1 = data[762:1271,:],data[1272:,:]
@@ -77,3 +87,5 @@ model = LogisticRegression()
 print(model.theta)
 model.fit(train_x,train_y,0.001)
 print(model.score(test_y,model.predict(test_x)))
+test_y = model.sigmoid(model.g_x(test_x))
+plot(test_y)
